@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كب كيك 🧁 منيو</title>
+<style>
+:root{--pink:#ff6fa5;--pink2:#ff9ec4;--cream:#fff7ef;--choc:#5a2a3c;--gold:#ffc857;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:var(--choc);min-height:100vh;padding-bottom:110px;
+background:radial-gradient(circle at 15% 10%,#ffe3ef 0,transparent 45%),radial-gradient(circle at 90% 30%,#ffd9b8 0,transparent 40%),linear-gradient(160deg,#ffb3d1,#ff8fb8 45%,#ffc6a8);background-attachment:fixed}
+header{text-align:center;padding:28px 16px 14px;color:#fff;text-shadow:0 3px 10px rgba(150,30,80,.35)}
+header h1{font-size:2.1rem}header p{margin-top:6px;font-size:1rem;opacity:.95}
+.badge{display:inline-block;margin-top:10px;background:var(--gold);color:var(--choc);padding:6px 16px;border-radius:30px;font-weight:700;text-shadow:none;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:14px;max-width:900px;margin:auto}
+.card{background:var(--cream);border-radius:24px;padding:12px 10px 14px;text-align:center;box-shadow:0 8px 20px rgba(140,30,80,.25);transition:transform .2s}
+.card:active{transform:scale(.97)}
+.card svg{width:100%;max-width:130px;height:auto}
+.card h3{font-size:1.05rem;margin:4px 0 2px}
+.card small{display:block;opacity:.7;font-size:.78rem;min-height:2.2em}
+.price{font-size:1.25rem;font-weight:800;color:var(--pink);margin:6px 0}
+.btn{border:0;cursor:pointer;font:inherit;font-weight:700;color:#fff;padding:10px 18px;border-radius:30px;background:linear-gradient(135deg,var(--pink),#ff4d8d);box-shadow:0 5px 14px rgba(255,77,141,.45);transition:transform .15s}
+.btn:active{transform:scale(.94)}
+.btn.alt{background:linear-gradient(135deg,#ffc857,#ffa63d);color:var(--choc);box-shadow:0 5px 14px rgba(255,166,61,.45)}
+.card .btn{width:100%}
+.overlay{position:fixed;inset:0;background:rgba(60,10,35,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.overlay.show{display:flex}
+.sheet{background:var(--cream);width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));animation:up .25s}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+.sheet h2{text-align:center;margin-bottom:6px}
+.sheet .big svg{width:120px;display:block;margin:auto}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{padding:8px 14px;border-radius:30px;border:2px solid var(--pink2);background:#fff;cursor:pointer;font:inherit;color:var(--choc)}
+.chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.qty{display:flex;align-items:center;justify-content:center;gap:16px;margin:12px 0}
+.qty button{width:40px;height:40px;border-radius:50%;border:0;background:var(--pink2);color:#fff;font-size:1.4rem;cursor:pointer}
+.qty b{font-size:1.4rem;min-width:30px;text-align:center}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px dashed var(--pink2)}
+.row small{opacity:.7;display:block}
+.x{background:none;border:0;font-size:1.2rem;cursor:pointer}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;z-index:10}
+.bar button{width:100%;max-width:520px;display:flex;justify-content:space-between;font-size:1.05rem;padding:14px 22px;box-shadow:0 8px 24px rgba(140,30,80,.45)}
+.hidden{display:none}
+.done{text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧁 كب كيك الأحلام</h1>
+  <p>كيك طازج، هش ولذيذ... بسعر لطيف</p>
+  <span class="badge">اطلب كب كيكتك المفضلة 💕</span>
+</header>
+<div class="grid" id="grid"></div>
+
+<div class="bar hidden" id="bar"><button class="btn" onclick="openCart()"><span id="cnt">0 قطعة</span><span>عرض السلة 🛒 <b id="tot">0</b></span></button></div>
+<div class="overlay" id="ov" onclick="if(event.target===this)closeAll()"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const CUR="$"; // غيّر العملة من هنا
+const items=[
+{id:1,n:"فانيلا كلاسيك",d:"هشة مع كريمة الفانيلا",p:2,f:"#fff1c9",l:"#ff8fb8",t:"sprinkle"},
+{id:2,n:"شوكولاتة غنية",d:"كاكاو داكن وكريمة شوكولاتة",p:2.5,f:"#8a4b38",l:"#c97b4a",t:"choc"},
+{id:3,n:"فراولة",d:"كريمة الفراولة الطازجة",p:2.5,f:"#ff9ec4",l:"#ff5c93",t:"cherry"},
+{id:4,n:"ريد فيلفت",d:"قطيفة حمراء مع كريم تشيز",p:3,f:"#fff",l:"#d63a4a",t:"heart"},
+{id:5,n:"كراميل",d:"صوص الكراميل الذهبي",p:3,f:"#f2b36b",l:"#b8742f",t:"drip"},
+{id:6,n:"أوريو",d:"كريمة وقطع أوريو مقرمشة",p:3,f:"#f4f0ea",l:"#4a3a44",t:"oreo"}];
+const extras=[
+{n:"صوص شوكولاتة",p:.5},{n:"سبرنكلز ملونة",p:.4},{n:"كرزة",p:.3},{n:"كريمة إضافية",p:.6},{n:"فستق مجروش",p:.7},{n:"صوص كراميل",p:.5}];
+const fmt=n=>(Math.round(n*100)/100)+" "+CUR;
+function cup(c,w){const top={
+sprinkle:'<circle cx="50" cy="40" r="2.5" fill="#ff4d8d"/><circle cx="62" cy="34" r="2.5" fill="#3cb9ff"/><circle cx="42" cy="30" r="2.5" fill="#ffc857"/><circle cx="55" cy="26" r="2.5" fill="#6bd66b"/>',
+choc:'<path d="M44 18q6-8 12 0z" fill="#3b1a1a"/>',cherry:'<circle cx="50" cy="15" r="6" fill="#d6203f"/><path d="M50 10q2-8 8-9" stroke="#2f7d32" stroke-width="2" fill="none"/>',
+heart:'<path d="M50 24c-8-8-12-2-7 3l7 6 7-6c5-5 1-11-7-3z" fill="#d63a4a"/>',drip:'<path d="M36 34q4 10 8 0t8 0 8 0" fill="#9a5a1c"/>',
+oreo:'<circle cx="50" cy="20" r="7" fill="#2b1f26"/><circle cx="50" cy="20" r="3" fill="#f4f0ea"/>'}[c.t];
+return `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="94" rx="30" ry="4" fill="rgba(0,0,0,.12)"/>
+<path d="M22 52h56l-7 40H29z" fill="${c.l}"/><path d="M36 52l3 40M50 52v40M64 52l-3 40" stroke="rgba(255,255,255,.35)" stroke-width="3"/>
+<ellipse cx="50" cy="52" rx="30" ry="7" fill="${c.f}"/>
+<path d="M24 52q-6-14 8-16 2-12 18-12t18 12q14 2 8 16z" fill="${c.f}"/>
+<path d="M32 44q18 8 36 0M30 36q20 8 40 0" stroke="rgba(0,0,0,.08)" stroke-width="3" fill="none"/>${top}</svg>`}
+let cart=[],cur=null,qty=1,sel=new Set();
+document.getElementById("grid").innerHTML=items.map(c=>`<div class="card">${cup(c)}<h3>${c.n}</h3><small>${c.d}</small><div class="price">${fmt(c.p)}</div><button class="btn" onclick="pick(${c.id})">+ اختار</button></div>`).join("");
+const $=i=>document.getElementById(i);
+function show(h){$("sheet").innerHTML=h;$("ov").classList.add("show")}
+function closeAll(){$("ov").classList.remove("show")}
+function pick(id){cur=items.find(c=>c.id===id);qty=1;sel=new Set();draw()}
+function unit(){return cur.p+[...sel].reduce((s,i)=>s+extras[i].p,0)}
+function draw(){show(`<div class="big">${cup(cur)}</div><h2>${cur.n}</h2><p style="text-align:center;opacity:.7">${cur.d}</p>
+<b>الإضافات 🍫</b><div class="chips">${extras.map((e,i)=>`<button class="chip ${sel.has(i)?"on":""}" onclick="tog(${i})">${e.n} +${fmt(e.p)}</button>`).join("")}</div>
+<div class="qty"><button onclick="q(-1)">−</button><b>${qty}</b><button onclick="q(1)">+</button></div>
+<button class="btn" style="width:100%" onclick="add()">أضف للسلة · ${fmt(unit()*qty)}</button>`)}
+function tog(i){sel.has(i)?sel.delete(i):sel.add(i);draw()}
+function q(d){qty=Math.max(1,qty+d);draw()}
+function add(){cart.push({c:cur,qty,ex:[...sel].map(i=>extras[i].n),u:unit()});closeAll();upd()}
+function upd(){const n=cart.reduce((s,i)=>s+i.qty,0),t=cart.reduce((s,i)=>s+i.u*i.qty,0);
+$("bar").classList.toggle("hidden",!n);$("cnt").textContent=n+" قطعة";$("tot").textContent=fmt(t)}
+function openCart(){const t=cart.reduce((s,i)=>s+i.u*i.qty,0);
+show(`<h2>سلتك 🛒</h2>${cart.map((i,k)=>`<div class="row"><div><b>${i.qty}× ${i.c.n}</b><small>${i.ex.join("، ")||"بدون إضافات"}</small></div><div>${fmt(i.u*i.qty)} <button class="x" onclick="del(${k})">🗑️</button></div></div>`).join("")}
+<div class="row"><b>المجموع</b><b style="font-size:1.3rem;color:var(--pink)">${fmt(t)}</b></div><br>
+<button class="btn alt" style="width:100%" onclick="done()">تأكيد الطلب ✅</button>`)}
+function del(k){cart.splice(k,1);upd();cart.length?openCart():closeAll()}
+function done(){cart=[];upd();show(`<div class="done"><div style="font-size:3rem">🎉🧁</div><h2>تم استلام طلبك!</h2><p>بنجهزلك كب كيكاتك طازجة 💕</p><br><button class="btn" onclick="closeAll()">رجوع للمنيو</button></div>`)}
+</script>
+</body>
+</html>
